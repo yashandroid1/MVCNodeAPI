@@ -10,11 +10,18 @@ if (process.env.NODE_ENV !== "production") {
     dotenv.config();
 }
 
+app.get('/' , (req ,res) =>{
+    res.send("App Running");
+});
+
+
 // Middleware
 app.use(express.json()); // Ensure this middleware is before route definitions
 // Routes
 const users = require("./app/routes/UsersRoutes");
 app.use("/api/battle/", users);
+
+
 
 // Start the Server
 const PORT = process.env.PORT || 8091;
