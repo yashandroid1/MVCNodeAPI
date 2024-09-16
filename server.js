@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 app.get('/' , (req ,res) =>{
-    res.send("App Working Good");
+    res.send("App Good");
 });
 
 
