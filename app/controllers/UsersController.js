@@ -22,7 +22,7 @@ exports.registerUser = async (req, res) => {
     // Check if email or mobile already exists
     const results = await UserModel.findByEmailOrMobile(email, mobile);
     if (results.length > 0) {
-      return res.status(400).json({status: "false" , message: "Email or Mobile already in use", users: null });
+      return res.status(400).json({status: "false" , message: "Email or Mobile already Exist", users: null });
     }
 
     // Encrypt password
@@ -144,7 +144,8 @@ exports.loginUser = async(req , res) =>{
 };
 
 
-exports.getBanners = async (req, res) => {
+
+exports.getBanners = async (res) => {
   try {
     const banners = await UserModel.getBanners(); // Fetch all banners
     res.status(200).json({status: "true" , message:"fetced" , banner: banners }); // Respond with the banners in JSON format
@@ -231,7 +232,7 @@ exports.getSologame = async (req, res) => {
     }
 
     // Extract fields from request body
-    const { category, status } = req.body;
+    const { category, status , typeStatus } = req.body;
 
     // Validate required fields
     if (!category || !status) {
@@ -239,7 +240,7 @@ exports.getSologame = async (req, res) => {
     }
 
      // Fetch SoloGame list based on category and status if token is valid
-     const soloGame = await UserModel.getSoloGame(category, status);
+     const soloGame = await UserModel.getSoloGame(category, status , typeStatus);
 
      if(soloGame.length==0){
       return res.status(400).json({ status: false, message: "InValid category or status", soloGame: null });
@@ -305,14 +306,15 @@ exports.createSoloGame = async (req, res) => {
       Charge,
       challangedSquadUsername,
       opponentSquadUsername,
-      status
+      status,
+      typeStatus
     } = req.body;
 
     // Logging to verify values
     console.log("Request Body:", req.body); // Log all values from the request body
 
     // Validate required fields
-    if (!category || !challangedPlayer || !challangedPlayerToken || !profileChld || !beatAmount || !winAmount || !type || !status  || !challangedSquadUsername) {
+    if (!category || !challangedPlayer || !challangedPlayerToken || !profileChld || !beatAmount || !winAmount || !type || !status  || !challangedSquadUsername || !typeStatus) {
       return res.status(400).json({ status: false, message: "Please fill all required fields", game: null });
     }
 
@@ -344,7 +346,8 @@ exports.createSoloGame = async (req, res) => {
       Charge: Charge || 0, // Default Charge to 0 if not provided
       challangedSquadUsername,
       opponentSquadUsername : null,
-      status
+      status,
+      typeStatus
     };
 
     // Proceed with saving the solo game in the database

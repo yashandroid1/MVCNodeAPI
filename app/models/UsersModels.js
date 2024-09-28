@@ -32,10 +32,10 @@ UserModel.findByReferCode = async (referCode) => {
 
 
 
-//Call homeBanner
+// Fetch all banners from the `banner` table
 UserModel.getBanners = async () => {
-  const query = "SELECT * FROM `banner`"; // Query to fetch all banners
-  return await promise_connection(query); // Execute the query without any parameters
+  const query = "SELECT * FROM `banner`";
+  return await promise_connection(query);
 };
 
 
@@ -53,12 +53,12 @@ UserModel.getSoloct = async () => {
       
 
 // Method to call SoloGame
-UserModel.getSoloGame = async (category, status) => {
+UserModel.getSoloGame = async (category, status , typeStatus) => {
   // Query to fetch solo games with filters for category and status
-  const query = "SELECT * FROM `sologame` WHERE `category` = ? AND `status` = ?";
+  const query = "SELECT * FROM `sologame` WHERE `category` = ? AND `status` = ? AND `typeStatus` = ?";
   
   // Parameters to pass to the query
-  const params = [category, status];
+  const params = [category, status , typeStatus];
   
   // Execute the query with parameters
   return await promise_connection(query, params);
