@@ -39,6 +39,15 @@ UserModel.getBanners = async () => {
 };
 
 
+// Fetch all current wallet details from the `users` table
+UserModel.getCurrentWltdtl = async (token) => {
+  const query = "SELECT `name`, `wallet`, `winWallet` FROM `users` WHERE `token` = ?";
+  const values = [token]; // Correctly format the values for the prepared statement
+  return await promise_connection(query, values);
+};
+
+
+
 // Method to check token
 UserModel.findByToken = async (token) => {
   let query = "SELECT * FROM `users` WHERE `token` = ? ";
@@ -47,7 +56,7 @@ UserModel.findByToken = async (token) => {
 
 // Method to call SoloCtList
 UserModel.getSoloct = async () => {
-  const query = "SELECT * FROM `soloct`"; // Query to fetch all banners
+  const query = "SELECT * FROM `soloct` WHERE `status` = 1 || `status` = 2; "; // Query to fetch all banners
   return await promise_connection(query); // Execute the query without any parameters
 };
       

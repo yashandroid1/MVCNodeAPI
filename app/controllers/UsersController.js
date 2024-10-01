@@ -145,15 +145,75 @@ exports.loginUser = async(req , res) =>{
 
 
 
-exports.getBanners = async (res) => {
+exports.getBanners = async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  // Check if authorization header is present
+  if (!authHeader) {
+    return res.status(401).json({
+      status: false,
+      message: "Authorization token is required",
+      banners: null,
+    });
+  }
+
+  // Extract the token from the authorization header
+  const token = authHeader.split(' ')[1]; // Fix the split logic
+
+  // Check if the token was properly extracted
+  if (!token) {
+    return res.status(401).json({
+      status: false,
+      message: "Invalid token format",
+      banners: null,
+    });
+  }
+
   try {
-    const banners = await UserModel.getBanners(); // Fetch all banners
-    res.status(200).json({status: "true" , message:"fetced" , banner: banners }); // Respond with the banners in JSON format
+    // Verify the token using the secret
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded Token:", decoded); // Log the decoded token for verification
+
+    // Check if the token exists in the database
+    const userResult = await UserModel.findByToken(token);
+    console.log("User result:", userResult); // Log the user result to ensure proper token handling
+
+    if (userResult.length === 0) {
+      return res.status(401).json({
+        status: false,
+        message: "Invalid token",
+        banners: null,
+      });
+    }
+
+    // Fetch banners if token is valid
+    const banners = await UserModel.getBanners(); // Invoke as a method
+    return res.status(200).json({
+      status: true,
+      message: "Data fetched",
+      banners,
+    });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ message: "Server error" });
+    // Handle JWT errors
+    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        status: false,
+        message: "Invalid or expired token",
+        banners: null,
+      });
+    }
+
+    // Handle other errors
+    console.error("Error stack trace:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+      banners: null,
+    });
   }
 };
+
+
 
 
 exports.getSoloct = async (req, res) => {
@@ -314,7 +374,7 @@ exports.createSoloGame = async (req, res) => {
     console.log("Request Body:", req.body); // Log all values from the request body
 
     // Validate required fields
-    if (!category || !challangedPlayer || !challangedPlayerToken || !profileChld || !beatAmount || !winAmount || !type || !status  || !challangedSquadUsername || !typeStatus) {
+    if (!category || !challangedPlayer || !challangedPlayerToken || !profileChld || !beatAmount || !winAmount || !type || !status  || !challangedSquadUsername || !typeStatus || !password) {
       return res.status(400).json({ status: false, message: "Please fill all required fields", game: null });
     }
 
@@ -875,5 +935,88 @@ exports.updateWallet = async (req, res) => {
     res.status(500).json({ status: "false", message: "Server error", error: error.message });
   }
 };
+
+
+
+exports.getCurrentWallet = async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  // Check if authorization header is present
+  if (!authHeader) {
+    return res.status(401).json({
+      status: false,
+      message: "Authorization token is required",
+      user: null, // Change to `user` instead of `users`
+    });
+  }
+
+  // Extract the token from the authorization header
+  const token = authHeader.split(' ')[1]; // Fix the split logic
+
+  // Check if the token was properly extracted
+  if (!token) {
+    return res.status(401).json({
+      status: false,
+      message: "Invalid token format",
+      user: null, // Change to `user` instead of `users`
+    });
+  }
+
+  try {
+    // Verify the token using the secret
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded Token:", decoded); // Log the decoded token for verification
+
+    // Check if the token exists in the database
+    const userResult = await UserModel.findByToken(token);
+    console.log("User result:", userResult); // Log the user result to ensure proper token handling
+
+    if (userResult.length === 0) {
+      return res.status(401).json({
+        status: false,
+        message: "Invalid token",
+        user: null, // Change to `user` instead of `users`
+      });
+    }
+
+    // Fetch user details if the token is valid
+    const users = await UserModel.getCurrentWltdtl(token); // Pass the token to the method
+
+    // Check if we have a user
+    if (users.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found",
+        user: null, // Change to `user` instead of `users`
+      });
+    }
+
+    // Return the first user instead of an array
+    const user = users[0]; // Get the first user object
+    return res.status(200).json({
+      status: true,
+      message: "Data fetched successfully",
+      user, // Return the single user object
+    });
+  } catch (error) {
+    // Handle JWT errors
+    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        status: false,
+        message: "Invalid or expired token",
+        user: null, // Change to `user` instead of `users`
+      });
+    }
+
+    // Handle other errors
+    console.error("Error stack trace:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+      user: null, // Change to `user` instead of `users`
+    });
+  }
+};
+
 
 

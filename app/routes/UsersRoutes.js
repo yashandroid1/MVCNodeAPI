@@ -5,7 +5,7 @@ loginUser , getBanners ,
  getSoloct , getSologame ,
  createSoloGame , updateSoloGame ,
  deleteSoloGame , getTournamentct ,
-  getTournamentList , crategamehistory , createwallethistory ,  getwallethistory , updateWallet} = require("../controllers/UsersController");
+  getTournamentList , crategamehistory , createwallethistory ,  getwallethistory , updateWallet , getCurrentWallet}  = require("../controllers/UsersController");
 
 // router.get("/test",function(){
 //     console.log("connected");
@@ -13,7 +13,7 @@ loginUser , getBanners ,
 // Define routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/banner", getBanners);
+router.post("/banner", getBanners);
 router.post("/soloct", getSoloct);
 router.post("/sologame", getSologame);
 router.post("/createsologame", createSoloGame);
@@ -25,6 +25,7 @@ router.post("/creategamehistory", crategamehistory);
 router.post("/createwallethistory", createwallethistory);
 router.post("/getwallethistory", getwallethistory);
 router.post("/updatewallet", updateWallet);
+router.post("/currentwtldtl", getCurrentWallet);
 
 
 module.exports = router;
